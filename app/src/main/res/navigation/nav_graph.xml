@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/MainListFragment">
+
+    <fragment
+        android:id="@+id/MainListFragment"
+        android:name="com.ko.mysingledairy.MainListFragment"
+        tools:layout="@layout/fragment_list">
+
+        <action
+            android:id="@+id/action_to_EditFragment"
+            app:destination="@+id/EditFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/EditFragment"
+        android:name="com.ko.mysingledairy.EditFragment"
+        tools:layout="@layout/fragment_edit">
+
+    </fragment>
+
+</navigation>

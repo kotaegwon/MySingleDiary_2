@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gl_hor_end"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.07" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gl_ver_button_boundary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.15" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gl_ver_button_end"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.3" />
+
+    <Button
+        android:id="@+id/btn_text_list"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:text="@string/btn_text_title"
+        app:layout_constraintBottom_toBottomOf="@id/gl_hor_end"
+        app:layout_constraintEnd_toEndOf="@id/gl_ver_button_boundary"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btn_image_list"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:text="@string/btn_img_title"
+        app:layout_constraintBottom_toBottomOf="@id/btn_text_list"
+        app:layout_constraintEnd_toEndOf="@id/gl_ver_button_end"
+        app:layout_constraintStart_toStartOf="@id/gl_ver_button_boundary"
+        app:layout_constraintTop_toTopOf="@id/btn_text_list" />
+
+    <Button
+        android:id="@+id/btn_edit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/select_button"
+        android:text="@string/write_today"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toBottomOf="@id/gl_hor_end"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/main_list"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/gl_hor_end" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
