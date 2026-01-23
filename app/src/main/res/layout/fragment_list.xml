@@ -5,7 +5,7 @@
     android:layout_height="match_parent">
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/gl_hor_end"
+        android:id="@+id/gl_hor_begin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -25,34 +25,36 @@
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.3" />
 
-    <Button
-        android:id="@+id/btn_text_list"
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/textListButton"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:text="@string/btn_text_title"
-        app:layout_constraintBottom_toBottomOf="@id/gl_hor_end"
+        app:layout_constraintBottom_toBottomOf="@id/gl_hor_begin"
         app:layout_constraintEnd_toEndOf="@id/gl_ver_button_boundary"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/btn_image_list"
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/imageListButton"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:text="@string/btn_img_title"
-        app:layout_constraintBottom_toBottomOf="@id/btn_text_list"
+        app:layout_constraintBottom_toBottomOf="@id/textListButton"
         app:layout_constraintEnd_toEndOf="@id/gl_ver_button_end"
         app:layout_constraintStart_toStartOf="@id/gl_ver_button_boundary"
-        app:layout_constraintTop_toTopOf="@id/btn_text_list" />
+        app:layout_constraintTop_toTopOf="@id/textListButton" />
 
     <Button
-        android:id="@+id/btn_edit"
+        android:id="@+id/editDisplayButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/select_button"
         android:text="@string/write_today"
         android:textColor="@color/white"
-        app:layout_constraintBottom_toBottomOf="@id/gl_hor_end"
+        app:layout_constraintBottom_toBottomOf="@id/gl_hor_begin"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -63,6 +65,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/gl_hor_end" />
+        app:layout_constraintTop_toTopOf="@id/gl_hor_begin" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

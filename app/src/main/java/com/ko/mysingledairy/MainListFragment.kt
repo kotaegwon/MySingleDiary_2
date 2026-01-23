@@ -1,11 +1,12 @@
 package com.ko.mysingledairy
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ko.mysingledairy.databinding.FragmentListBinding
 import com.ko.mysingledairy.view.DiaryAdapter
@@ -13,13 +14,14 @@ import com.ko.mysingledairy.view.DiaryItem
 import com.ko.mysingledairy.view.DiaryUiItem
 import timber.log.Timber
 
-class MainListFragment : Fragment() {
+class MainListFragment : Fragment(), View.OnClickListener {
     private lateinit var binding: FragmentListBinding
     private lateinit var adapter: DiaryAdapter
+    private var diaryItems: List<DiaryItem> = emptyList()
 
     private fun loadDummyTextItems() {
         // 임의 DiaryItem 생성
-        val diaryItems = listOf(
+        diaryItems = listOf(
             DiaryItem(
                 id = 1,
                 weather = "맑음",
@@ -65,6 +67,17 @@ class MainListFragment : Fragment() {
         adapter.submitList(uiItems)
     }
 
+    fun selectTab(isText: Boolean) {
+        val selectedColor = ContextCompat.getColor(requireContext(), R.color.white)
+        val normalColor = ContextCompat.getColor(requireContext(), R.color.orange)
+
+        binding.textListButton.setTextColor(if (isText) selectedColor else normalColor)
+        binding.textListButton.setBackgroundColor(if (isText) normalColor else selectedColor)
+
+        binding.imageListButton.setTextColor(if (isText) normalColor else selectedColor)
+        binding.imageListButton.setBackgroundColor(if (isText) selectedColor else normalColor)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -72,16 +85,16 @@ class MainListFragment : Fragment() {
     ): View? {
         Timber.d("onCreateView +")
 
-        binding = FragmentListBinding.inflate(layoutInflater)
+        binding = FragmentListBinding.inflate(inflater, container, false)
         var layoutManager = LinearLayoutManager(activity)
         binding.recyclerview.layoutManager = layoutManager
 
         adapter = DiaryAdapter()
         binding.recyclerview.adapter = adapter
 
-        return binding.root
-
         Timber.d("onCreateView +")
+
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -91,12 +104,53 @@ class MainListFragment : Fragment() {
 
         loadDummyTextItems()
 
+        val textColor = ContextCompat.getColor(requireContext(), R.color.white)
+        val backGroundColor = ContextCompat.getColor(requireContext(), R.color.orange)
+
+        binding.textListButton.setTextColor(textColor)
+        binding.textListButton.setBackgroundColor(backGroundColor)
+
+        binding.textListButton.setOnClickListener(this)
+        binding.imageListButton.setOnClickListener(this)
+        binding.editDisplayButton.setOnClickListener(this)
+
         Timber.d("onViewCreated +")
     }
 
     override fun onDestroyView() {
         Timber.d("onDestroyView +")
+
         super.onDestroyView()
+
         Timber.d("onDestroyView -")
+    }
+
+    override fun onClick(view: View?) {
+        val uiItem = when (view?.id) {
+            R.id.textListButton -> {
+                selectTab(true)
+
+                diaryItems.map {
+                    DiaryUiItem.Text(it)
+                }
+            }
+
+            R.id.imageListButton -> {
+                selectTab(false)
+
+                diaryItems.map {
+                    DiaryUiItem.Image(it)
+                }
+            }
+
+            R.id.editDisplayButton -> {
+                findNavController().navigate(R.id.action_to_EditFragment)
+                null
+            }
+
+            else -> null
+        }
+
+        uiItem?.let { adapter.submitList(uiItem) }
     }
 }

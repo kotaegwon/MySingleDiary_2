@@ -12,7 +12,6 @@ import timber.log.Timber
 class TextViewHolder(val binding: ListItem1Binding) : RecyclerView.ViewHolder(binding.root) {
 
     fun bind(item: DiaryItem) {
-        Timber.d("item : $item")
         binding.contentsTextView.text = item.contents
         binding.locationTextView.text = item.address
         binding.dateTextView.text = item.createDateStr

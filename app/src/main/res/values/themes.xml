@@ -1,6 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.MySingleDiary" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="Theme.MySingleDiary" parent="Theme.Material3.Light.NoActionBar">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/orange</item>
         <item name="colorPrimaryVariant">@color/orange</item>
@@ -17,4 +17,14 @@
     <style name="SplashTheme" parent="Theme.AppCompat.NoActionBar">
         <item name="android:windowBackground">@drawable/splash_background</item>
     </style>
+
+    <style name="EditDisplayButton">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">@drawable/select_button</item>
+        <item name="android:backgroundTint">#00000000</item>
+        <item name="android:backgroundTintMode">add</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
 </resources>
