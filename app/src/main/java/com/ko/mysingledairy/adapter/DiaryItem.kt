@@ -1,4 +1,4 @@
-package com.ko.mysingledairy.view
+package com.ko.mysingledairy.adapter
 
 data class DiaryItem(
     var id: Int,

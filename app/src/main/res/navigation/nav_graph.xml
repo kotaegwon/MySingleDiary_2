@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/MainListFragment"
-        android:name="com.ko.mysingledairy.MainListFragment"
+        android:name="com.ko.mysingledairy.fragment.MainListFragment"
         tools:layout="@layout/fragment_list">
 
         <action
@@ -17,7 +17,7 @@
 
     <fragment
         android:id="@+id/EditFragment"
-        android:name="com.ko.mysingledairy.EditFragment"
+        android:name="com.ko.mysingledairy.fragment.EditFragment"
         tools:layout="@layout/fragment_edit">
 
     </fragment>

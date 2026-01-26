@@ -1,4 +1,4 @@
-package com.ko.mysingledairy
+package com.ko.mysingledairy.fragment
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,10 +8,11 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.ko.mysingledairy.R
 import com.ko.mysingledairy.databinding.FragmentListBinding
-import com.ko.mysingledairy.view.DiaryAdapter
-import com.ko.mysingledairy.view.DiaryItem
-import com.ko.mysingledairy.view.DiaryUiItem
+import com.ko.mysingledairy.adapter.DiaryAdapter
+import com.ko.mysingledairy.adapter.DiaryItem
+import com.ko.mysingledairy.adapter.DiaryUiItem
 import timber.log.Timber
 
 class MainListFragment : Fragment(), View.OnClickListener {

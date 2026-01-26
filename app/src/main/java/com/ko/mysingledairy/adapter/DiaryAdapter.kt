@@ -1,4 +1,4 @@
-package com.ko.mysingledairy.view
+package com.ko.mysingledairy.adapter
 
 import android.view.LayoutInflater
 import android.view.View
@@ -6,7 +6,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.ko.mysingledairy.databinding.ListItem1Binding
 import com.ko.mysingledairy.databinding.ListItem2Binding
-import timber.log.Timber
 
 
 class TextViewHolder(val binding: ListItem1Binding) : RecyclerView.ViewHolder(binding.root) {

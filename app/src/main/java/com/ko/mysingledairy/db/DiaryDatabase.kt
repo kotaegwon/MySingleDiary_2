@@ -3,7 +3,7 @@ package com.ko.mysingledairy.db
 import androidx.room.Database
 
 @Database(
-    entities = [DiaryDatabase::class, LocationWeatherEntity::class],
+    entities = [DiaryDatabase::class],
     version = 1,
     exportSchema = false
 )
