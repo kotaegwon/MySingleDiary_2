@@ -16,6 +16,7 @@ import com.ko.mysingledairy.DiaryViewModel
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
+//TODO 날짜 표시, DB에 저장할때는 앞에 년도 붙어서 저장, 작성 화면에 표시할때는 년도 뺴고 저장
 class EditFragment : Fragment(), View.OnClickListener {
     private lateinit var binding: FragmentEditBinding
 
@@ -60,14 +61,15 @@ class EditFragment : Fragment(), View.OnClickListener {
                 // 날씨 정보 Flow
                 launch {
                     viewModel.weather.collect { weather ->
-
                         // 날씨 아이콘 표시 여부
-                        binding.weatherIcon.visibility =
-                            if (weather.isNullOrEmpty()) {
-                                View.GONE
-                            } else {
-                                View.VISIBLE
-                            }
+                        setWeatherIcon(weather.toString())
+
+//                        binding.weatherIcon.visibility =
+//                            if (weather.isNullOrEmpty()) {
+//                                View.GONE
+//                            } else {
+//                                View.VISIBLE
+//                            }
                     }
                 }
             }
@@ -97,6 +99,15 @@ class EditFragment : Fragment(), View.OnClickListener {
             R.id.deleteButton -> {
 
             }
+        }
+    }
+
+    fun setWeatherIcon(weather: String) {
+        when (weather) {
+            "맑음" -> binding.weatherIcon.setImageResource(R.drawable.weather_1)
+            "흐림" -> binding.weatherIcon.setImageResource(R.drawable.weather_4)
+            "비" -> binding.weatherIcon.setImageResource(R.drawable.weather_5)
+            "눈" -> binding.weatherIcon.setImageResource(R.drawable.weather_7)
         }
     }
 }

@@ -16,5 +16,9 @@ class DiaryViewModel : ViewModel() {
         )
 
     val weather: StateFlow<String?> =
-        DiaryRepository.cityDistrictFlow
+        DiaryRepository.weatherFlow.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Companion.WhileSubscribed(5_000),
+            initialValue = null
+        )
 }

@@ -16,6 +16,7 @@ class MainService : Service(), CoroutineScope by MainScope() {
     // 위 정보를 받아 db 저장
     private lateinit var locationManager: LocationManager
     private lateinit var weatherManager: WeatherManager
+    private var city: String = ""
 
     override fun onCreate() {
         Timber.d("onCreate +")
@@ -26,6 +27,7 @@ class MainService : Service(), CoroutineScope by MainScope() {
         weatherManager = WeatherManager(this, this)
 
         startLocationLoop()
+        startWeatherLoop()
 
         Timber.d("onCreate -")
     }
@@ -53,9 +55,24 @@ class MainService : Service(), CoroutineScope by MainScope() {
                     cityDistrict?.let {
                         Timber.d("위치 저장: $it")
                         DiaryRepository.updateLocation(it)
+                        city = it.split(" ")[0]
                     }
                 }
-                kotlinx.coroutines.delay(5 * 60 * 1000)
+                kotlinx.coroutines.delay(2 * 1000)
+            }
+        }
+    }
+
+    private fun startWeatherLoop() {
+        launch {
+            while (true) {
+                if (city.isNotEmpty()) {
+                    weatherManager.fetchWeather(city) { cityWeather ->
+                        Timber.d("$city 날씨 조회: $cityWeather")
+                        DiaryRepository.updateWeather(cityWeather.toString())
+                    }
+                }
+                kotlinx.coroutines.delay(2 * 1000)
             }
         }
     }
