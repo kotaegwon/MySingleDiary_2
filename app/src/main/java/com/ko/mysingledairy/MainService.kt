@@ -72,7 +72,7 @@ class MainService : Service(), CoroutineScope by MainScope() {
                         DiaryRepository.updateWeather(cityWeather.toString())
                     }
                 }
-                kotlinx.coroutines.delay(2 * 1000)
+                kotlinx.coroutines.delay(2 *  1000)
             }
         }
     }

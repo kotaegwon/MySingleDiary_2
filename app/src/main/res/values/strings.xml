@@ -21,4 +21,8 @@
 
     <string name="btn_text_title">내용</string>
     <string name="btn_img_title">사진</string>
+
+    <string name="dialog_title">사진 메뉴 선택</string>
+    <string name="dialog_menu_1">사진 찍기</string>
+    <string name="dialog_menu_2">앨범에서 선택하기</string>
 </resources>
