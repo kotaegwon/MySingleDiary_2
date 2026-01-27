@@ -1,32 +1,85 @@
 package com.ko.mysingledairy.adapter
 
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.net.toUri
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
+import com.ko.mysingledairy.R
 import com.ko.mysingledairy.databinding.ListItem1Binding
 import com.ko.mysingledairy.databinding.ListItem2Binding
+import com.ko.mysingledairy.db.DiaryListEntity
+import java.io.File
 
 
 class TextViewHolder(val binding: ListItem1Binding) : RecyclerView.ViewHolder(binding.root) {
 
-    fun bind(item: DiaryItem) {
-        binding.contentsTextView.text = item.contents
+    fun bind(item: DiaryListEntity) {
+        binding.contentsTextView.text = item.content
         binding.locationTextView.text = item.address
-        binding.dateTextView.text = item.createDateStr
+        binding.dateTextView.text = item.date
+        binding.pictureImageView.isVisible = !item.picture.isNullOrEmpty()
 
-        binding.pictureExistsImageView.visibility = if (!item.picture) View.GONE else View.VISIBLE
-
-        // TODO mood: Int로 변환 기문 아이콘 리소스 설정,
+        binding.moodImageView.setImageResource(
+            when (item.mood) {
+                1 -> R.drawable.smile1_48
+                2 -> R.drawable.smile2_48
+                3 -> R.drawable.smile3_48
+                4 -> R.drawable.smile4_48
+                5 -> R.drawable.smile5_48
+                else -> R.drawable.smile1_48
+            }
+        )
+        binding.weatherImageView.setImageResource(
+            when (item.weather) {
+                "맑음" -> R.drawable.weather_1
+                "흐림" -> R.drawable.weather_4
+                "비" -> R.drawable.weather_5
+                "눈" -> R.drawable.weather_7
+                else -> R.drawable.weather_1
+            }
+        )
 
     }
 }
 
 class ImageViewHolder(val binding: ListItem2Binding) : RecyclerView.ViewHolder(binding.root) {
 
-    fun bind(item: DiaryItem) {
+    fun bind(item: DiaryListEntity) {
+        binding.contentsTextView2.text = item.content
+        binding.locationTextView2.text = item.address
+        binding.dateTextView2.text = item.date
 
+        item.picture?.let { path ->
+            val file = File(path)
+            if(file.exists()){
+                binding.pictureImageView.setImageURI(Uri.fromFile(file))
+            }
+        }
+
+        binding.moodImageView2.setImageResource(
+            when (item.mood) {
+                1 -> R.drawable.smile1_48
+                2 -> R.drawable.smile2_48
+                3 -> R.drawable.smile3_48
+                4 -> R.drawable.smile4_48
+                5 -> R.drawable.smile5_48
+                else -> R.drawable.smile1_48
+            }
+        )
+        binding.weatherImageView2.setImageResource(
+            when (item.weather) {
+                "맑음" -> R.drawable.weather_1
+                "흐림" -> R.drawable.weather_4
+                "비" -> R.drawable.weather_5
+                "눈" -> R.drawable.weather_7
+                else -> R.drawable.weather_1
+            }
+        )
     }
+
 }
 
 class DiaryAdapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>() {

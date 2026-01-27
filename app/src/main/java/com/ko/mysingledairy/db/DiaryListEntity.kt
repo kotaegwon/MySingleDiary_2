@@ -23,7 +23,7 @@ data class DiaryListEntity(
     var content: String,
 
     @ColumnInfo(name = "picture")
-    var picture: String,
+    var picture: String?,
 
     @ColumnInfo(name = "mood")
     var mood: Int

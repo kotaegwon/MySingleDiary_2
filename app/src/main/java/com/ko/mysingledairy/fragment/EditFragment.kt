@@ -50,8 +50,9 @@ class EditFragment : Fragment(), View.OnClickListener {
             uri?.let {
                 Timber.d("선택된 이미지 URI: $it")
                 // 여기서 이미지 처리 or 저장
-                currentPhotoUri = it
-                binding.pictureImageView.setImageURI(it)
+                val savedPath = copyUriToInternalStorage(it)
+                currentPhotoUri = Uri.fromFile(File(savedPath))
+                binding.pictureImageView.setImageURI(currentPhotoUri)
             }
         }
 
@@ -64,6 +65,10 @@ class EditFragment : Fragment(), View.OnClickListener {
                 binding.pictureImageView.setImageURI(photoUri)
             }
         }
+
+    companion object{
+
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -86,7 +91,7 @@ class EditFragment : Fragment(), View.OnClickListener {
 
         super.onViewCreated(view, savedInstanceState)
 
-        binding.dateTextView.text = getUIDate()
+        binding.dateTextView.text = todayDate()
 
         binding.moodSlider.addOnChangeListener { _, value, _ ->
             val mood = value.toInt()
@@ -141,10 +146,10 @@ class EditFragment : Fragment(), View.OnClickListener {
                 val address = binding.locationTextView.text.toString()
                 val diaryEntities = DiaryListEntity(
                     weather = currentWeather.toString(),
-                    date = getDBDate(),
+                    date = todayDate(),
                     address = address,
                     content = content,
-                    picture = currentPhotoUri.toString(),
+                    picture = currentPhotoUri?.path,
                     mood = currentMood
                 )
 
@@ -176,9 +181,7 @@ class EditFragment : Fragment(), View.OnClickListener {
         }
     }
 
-    fun getDBDate(): String = SimpleDateFormat("yyyy년 MM월 dd일", Locale.KOREA).format(Date())
-
-    fun getUIDate(): String = SimpleDateFormat("MM월 dd일", Locale.KOREA).format(Date())
+    fun todayDate(): String = SimpleDateFormat("MM월 dd일", Locale.KOREA).format(Date())
 
     fun showPictureSetDialog() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_radio, null)
@@ -241,5 +244,21 @@ class EditFragment : Fragment(), View.OnClickListener {
         )
 
         cameraLauncher.launch(photoUri)
+    }
+
+    private fun copyUriToInternalStorage(uri: Uri): String {
+        val resolver = requireContext().contentResolver
+        val inputStream = resolver.openInputStream(uri) ?: return ""
+
+        val file = File(
+            requireContext().filesDir,
+            "diary_${System.currentTimeMillis()}.jpg"
+        )
+
+        file.outputStream().use { output ->
+            inputStream.copyTo(output)
+        }
+
+        return file.absolutePath
     }
 }

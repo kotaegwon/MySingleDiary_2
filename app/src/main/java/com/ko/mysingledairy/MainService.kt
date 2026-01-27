@@ -11,9 +11,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class MainService : Service(), CoroutineScope by MainScope() {
-    // 위치 -> 주소
-    // 날씨
-    // 위 정보를 받아 db 저장
+
     private lateinit var locationManager: LocationManager
     private lateinit var weatherManager: WeatherManager
     private var city: String = ""
@@ -53,7 +51,7 @@ class MainService : Service(), CoroutineScope by MainScope() {
             while (true) {
                 locationManager.fetchCityDistrict { cityDistrict ->
                     cityDistrict?.let {
-                        Timber.d("위치 저장: $it")
+//                        Timber.d("위치 저장: $it")
                         DiaryRepository.updateLocation(it)
                         city = it.split(" ")[0]
                     }
@@ -68,7 +66,7 @@ class MainService : Service(), CoroutineScope by MainScope() {
             while (true) {
                 if (city.isNotEmpty()) {
                     weatherManager.fetchWeather(city) { cityWeather ->
-                        Timber.d("$city 날씨 조회: $cityWeather")
+//                        Timber.d("$city 날씨 조회: $cityWeather")
                         DiaryRepository.updateWeather(cityWeather.toString())
                     }
                 }
