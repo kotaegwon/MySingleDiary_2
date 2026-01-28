@@ -1,6 +1,7 @@
 package com.ko.mysingledairy.fragment
 
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -24,6 +25,7 @@ import com.ko.mysingledairy.databinding.FragmentEditBinding
 import com.ko.mysingledairy.db.DiaryDao
 import com.ko.mysingledairy.db.DiaryDatabase
 import com.ko.mysingledairy.db.DiaryListEntity
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.io.File
@@ -66,7 +68,7 @@ class EditFragment : Fragment(), View.OnClickListener {
             }
         }
 
-    companion object{
+    companion object {
 
     }
 
@@ -90,8 +92,21 @@ class EditFragment : Fragment(), View.OnClickListener {
         Timber.d("onViewCreated +")
 
         super.onViewCreated(view, savedInstanceState)
-
         binding.dateTextView.text = todayDate()
+
+        val diary = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            arguments?.getParcelable(
+                "diary_item",
+                DiaryListEntity::class.java
+            )
+        } else {
+            @Suppress("DEPRECATION")
+            arguments?.getParcelable("diary_item")
+        }
+
+        diary?.let {
+            setBundleArgument(it)
+        }
 
         binding.moodSlider.addOnChangeListener { _, value, _ ->
             val mood = value.toInt()
@@ -170,6 +185,24 @@ class EditFragment : Fragment(), View.OnClickListener {
                 showPictureSetDialog()
             }
         }
+    }
+
+    fun setBundleArgument(items: DiaryListEntity) {
+        setWeatherIcon(items.weather)
+        binding.dateTextView.text = items.date
+        binding.locationTextView.text = items.address
+        binding.contentInput.setText(items.content)
+
+        items.picture?.let { path ->
+            val file = File(path)
+            if (file.exists()) {
+                binding.pictureImageView.setImageURI(Uri.fromFile(file))
+                currentPhotoUri = Uri.fromFile(file)
+            }
+        }
+
+        binding.moodSlider.value = items.mood.coerceIn(1, 5).toFloat()
+
     }
 
     fun setWeatherIcon(weather: String) {

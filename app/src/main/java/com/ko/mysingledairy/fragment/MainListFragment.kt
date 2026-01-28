@@ -1,5 +1,6 @@
 package com.ko.mysingledairy.fragment
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -19,9 +20,11 @@ import com.ko.mysingledairy.db.DiaryListEntity
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-class MainListFragment : Fragment(), View.OnClickListener {
-    private lateinit var binding: FragmentListBinding
+class MainListFragment : Fragment(), View.OnClickListener, DiaryAdapter.Listener {
+    private var _binding: FragmentListBinding? = null
+    private val binding get() = _binding!!
     private lateinit var adapter: DiaryAdapter
+
     private var diaryList: List<DiaryListEntity> = emptyList()
     private lateinit var diaryDao: DiaryDao
 
@@ -31,12 +34,11 @@ class MainListFragment : Fragment(), View.OnClickListener {
         savedInstanceState: Bundle?
     ): View? {
         Timber.d("onCreateView +")
-
-        binding = FragmentListBinding.inflate(inflater, container, false)
+        _binding = FragmentListBinding.inflate(inflater, container, false)
         var layoutManager = LinearLayoutManager(activity)
         binding.recyclerview.layoutManager = layoutManager
 
-        adapter = DiaryAdapter()
+        adapter = DiaryAdapter(this)
         binding.recyclerview.adapter = adapter
 
         val db = DiaryDatabase.get(requireContext())
@@ -50,8 +52,6 @@ class MainListFragment : Fragment(), View.OnClickListener {
         Timber.d("onViewCreated +")
 
         super.onViewCreated(view, savedInstanceState)
-
-//        loadDummyTextItems()
 
         val textColor = ContextCompat.getColor(requireContext(), R.color.white)
         val backGroundColor = ContextCompat.getColor(requireContext(), R.color.orange)
@@ -74,7 +74,6 @@ class MainListFragment : Fragment(), View.OnClickListener {
             val uiItems = diaryList.map {
                 DiaryUiItem.Text(it)
             }
-
             adapter.submitList(uiItems)
         }
 
@@ -85,47 +84,9 @@ class MainListFragment : Fragment(), View.OnClickListener {
         Timber.d("onDestroyView +")
 
         super.onDestroyView()
+        _binding = null
 
         Timber.d("onDestroyView -")
-    }
-
-    private fun loadDummyTextItems() {
-        // 임의 DiaryItem 생성
-        diaryList = listOf(
-            DiaryListEntity(
-                weather = "맑음",
-                address = "서울 강남구",
-                content = "오늘은 기분이 좋았다.",
-                mood = 0,
-                picture = "",
-                date = "2026-01-23"
-            ),
-            DiaryListEntity(
-                weather = "맑음",
-                address = "서울 강남구",
-                content = "오늘은 기분이 좋았다.",
-                mood = 0,
-                picture = "",
-                date = "2026-01-23"
-            ),
-            DiaryListEntity(
-                weather = "맑음",
-                address = "서울 강남구",
-                content = "오늘은 기분이 좋았다.",
-                mood = 0,
-                picture = "",
-                date = "2026-01-23"
-            ),
-        )
-
-        // DiaryItem → DiaryUiItem.Text 로 변환
-        // map: 각 요소를 하나씩 변환해서 새 리스트 생성
-        val uiItems = diaryList.map {
-            DiaryUiItem.Text(it)
-        }
-
-        // Adapter에 전달
-        adapter.submitList(uiItems)
     }
 
     fun selectTab(isText: Boolean) {
@@ -166,5 +127,14 @@ class MainListFragment : Fragment(), View.OnClickListener {
         }
 
         uiItem?.let { adapter.submitList(uiItem) }
+    }
+
+    override fun onItemClick(items: DiaryListEntity) {
+        findNavController().navigate(
+            R.id.action_to_EditFragment,
+            Bundle().apply {
+                putParcelable("diary_item", items)
+            })
+        Timber.d("onItemClick: $items")
     }
 }
