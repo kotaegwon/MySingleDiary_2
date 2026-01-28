@@ -12,12 +12,16 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.navigation.NavController
+import androidx.navigation.Navigation
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import com.ko.mysingledairy.databinding.ActivityMainBinding
 import timber.log.Timber
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
+    private lateinit var navController: NavController
 
     private val permissionLauncher =
         registerForActivityResult(
@@ -56,7 +60,7 @@ class MainActivity : AppCompatActivity() {
 //        }
         setSupportActionBar(binding.toolbar)
 
-        val navController = findNavController(R.id.nav_host_fragment_content_main)
+        navController = findNavController(R.id.nav_host_fragment_content_main)
 
         startService(Intent(this, MainService::class.java))
 
@@ -78,10 +82,15 @@ class MainActivity : AppCompatActivity() {
         when (item.itemId) {
             R.id.tab1 -> {
                 Toast.makeText(this@MainActivity, "목록", Toast.LENGTH_SHORT).show()
+                val currentFragmentId = navController.currentDestination?.id
+                if (currentFragmentId != R.id.MainListFragment) {
+                    navController.popBackStack()
+                }
             }
 
             R.id.tab2 -> {
                 Toast.makeText(this@MainActivity, "작성", Toast.LENGTH_SHORT).show()
+                navController.navigate(R.id.action_to_EditFragment)
             }
         }
         return true

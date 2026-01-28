@@ -102,7 +102,7 @@ class DiaryAdapter(val listener: Listener) :
             binding.contentsTextView.text = item.content
             binding.locationTextView.text = item.address
             binding.dateTextView.text = item.date
-            binding.pictureImageView.isVisible = !item.picture.isNullOrEmpty()
+            binding.pictureExistsImageView.isVisible = !item.picture.isNullOrEmpty()
 
             binding.moodImageView.setImageResource(
                 when (item.mood) {

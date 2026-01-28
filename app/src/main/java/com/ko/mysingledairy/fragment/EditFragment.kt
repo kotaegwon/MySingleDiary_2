@@ -25,6 +25,7 @@ import com.ko.mysingledairy.databinding.FragmentEditBinding
 import com.ko.mysingledairy.db.DiaryDao
 import com.ko.mysingledairy.db.DiaryDatabase
 import com.ko.mysingledairy.db.DiaryListEntity
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -46,6 +47,9 @@ class EditFragment : Fragment(), View.OnClickListener {
 
     private lateinit var photoFile: File
     private lateinit var photoUri: Uri
+    private lateinit var modifyItem: DiaryListEntity
+
+    private var isEditMode: Boolean = false
 
     private val photoPickerLauncher =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
@@ -146,6 +150,7 @@ class EditFragment : Fragment(), View.OnClickListener {
         Timber.d("onDestroyView +")
 
         super.onDestroyView()
+        isEditMode = false
 
         Timber.d("onDestroyView -")
     }
@@ -157,6 +162,7 @@ class EditFragment : Fragment(), View.OnClickListener {
             }
 
             R.id.saveButton -> {
+                var toastText = ""
                 val content = binding.contentInput.text.toString()
                 val address = binding.locationTextView.text.toString()
                 val diaryEntities = DiaryListEntity(
@@ -168,17 +174,35 @@ class EditFragment : Fragment(), View.OnClickListener {
                     mood = currentMood
                 )
 
-                lifecycleScope.launch {
-                    Timber.d("entities ; $diaryEntities")
-                    diaryDao.saveDB(diaryEntities)
+                lifecycleScope.launch(Dispatchers.IO) {
+                    if (isEditMode) {
+                        if (currentMood != 0) {
+                            modifyItem.mood = currentMood
+                        }
+                        modifyItem.content = content
+                        modifyItem.picture = currentPhotoUri?.path
+                        diaryDao.modifyDiary(modifyItem)
+                    } else {
+                        diaryDao.saveDB(diaryEntities)
+                    }
                 }
 
-                Toast.makeText(requireContext(), "저장 완료", Toast.LENGTH_SHORT).show()
+                toastText = if (isEditMode) {
+                    "수정 완료"
+                } else {
+                    "저장 완료"
+                }
+
+                Toast.makeText(requireContext(), toastText, Toast.LENGTH_SHORT).show()
                 findNavController().popBackStack()
             }
 
-            R.id.deleteButton -> {
 
+            R.id.deleteButton -> {
+                lifecycleScope.launch(Dispatchers.IO) {
+                    diaryDao.deleteById(modifyItem.id)
+                }
+                findNavController().popBackStack()
             }
 
             R.id.pictureImageView -> {
@@ -188,6 +212,9 @@ class EditFragment : Fragment(), View.OnClickListener {
     }
 
     fun setBundleArgument(items: DiaryListEntity) {
+        isEditMode = true
+        modifyItem = items
+
         setWeatherIcon(items.weather)
         binding.dateTextView.text = items.date
         binding.locationTextView.text = items.address
@@ -200,9 +227,7 @@ class EditFragment : Fragment(), View.OnClickListener {
                 currentPhotoUri = Uri.fromFile(file)
             }
         }
-
         binding.moodSlider.value = items.mood.coerceIn(1, 5).toFloat()
-
     }
 
     fun setWeatherIcon(weather: String) {
