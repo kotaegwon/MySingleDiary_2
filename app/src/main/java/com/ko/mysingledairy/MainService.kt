@@ -3,7 +3,9 @@ package com.ko.mysingledairy
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
-import com.ko.mysingledairy.repository.DiaryRepository
+import com.ko.mysingledairy.manager.LocationManager
+import com.ko.mysingledairy.manager.WeatherManager
+import com.ko.mysingledairy.DiarySharedStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
@@ -52,7 +54,7 @@ class MainService : Service(), CoroutineScope by MainScope() {
                 locationManager.fetchCityDistrict { cityDistrict ->
                     cityDistrict?.let {
 //                        Timber.d("위치 저장: $it")
-                        DiaryRepository.updateLocation(it)
+                        DiarySharedStore.updateLocation(it)
                         city = it.split(" ")[0]
                     }
                 }
@@ -67,7 +69,7 @@ class MainService : Service(), CoroutineScope by MainScope() {
                 if (city.isNotEmpty()) {
                     weatherManager.fetchWeather(city) { cityWeather ->
 //                        Timber.d("$city 날씨 조회: $cityWeather")
-                        DiaryRepository.updateWeather(cityWeather.toString())
+                        DiarySharedStore.updateWeather(cityWeather.toString())
                     }
                 }
                 kotlinx.coroutines.delay(2 *  1000)

@@ -1,9 +1,9 @@
-package com.ko.mysingledairy.repository
+package com.ko.mysingledairy
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-object DiaryRepository {
+object DiarySharedStore {
     private val _cityDistrictFlow = MutableStateFlow<String?>(null)
     val cityDistrictFlow: StateFlow<String?> = _cityDistrictFlow
 

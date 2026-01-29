@@ -19,7 +19,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.ko.mysingledairy.BuildConfig
-import com.ko.mysingledairy.DiaryViewModel
+import com.ko.mysingledairy.viewmodel.DiaryViewModel
 import com.ko.mysingledairy.R
 import com.ko.mysingledairy.databinding.FragmentEditBinding
 import com.ko.mysingledairy.db.DiaryDao

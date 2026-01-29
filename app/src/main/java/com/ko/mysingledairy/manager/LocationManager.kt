@@ -1,4 +1,4 @@
-package com.ko.mysingledairy
+package com.ko.mysingledairy.manager
 
 import android.annotation.SuppressLint
 import android.content.Context

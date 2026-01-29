@@ -1,6 +1,7 @@
-package com.ko.mysingledairy
+package com.ko.mysingledairy.manager
 
 import android.content.Context
+import com.ko.mysingledairy.BuildConfig
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
