@@ -23,25 +23,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
 
-    private val permissionLauncher =
-        registerForActivityResult(
-            ActivityResultContracts.RequestMultiplePermissions()
-        ) { permissions ->
-
-            val locationGranted =
-                permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true
-
-            val albumGranted =
-                permissions[Manifest.permission.READ_MEDIA_IMAGES] == true ||
-                        permissions[Manifest.permission.READ_EXTERNAL_STORAGE] == true
-
-            if (locationGranted && albumGranted) {
-                Toast.makeText(this, "모든 권한 허용됨", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(this, "일부 권한이 거부됨", Toast.LENGTH_SHORT).show()
-            }
-        }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         Timber.d("onCreate +")
         super.onCreate(savedInstanceState)
@@ -61,8 +42,6 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(binding.toolbar)
 
         navController = findNavController(R.id.nav_host_fragment_content_main)
-
-        startService(Intent(this, MainService::class.java))
 
         Timber.d("onCreate +")
     }
@@ -95,6 +74,25 @@ class MainActivity : AppCompatActivity() {
         }
         return true
     }
+
+    private val permissionLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions()
+        ) { permissions ->
+
+            val locationGranted =
+                permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true
+
+            val albumGranted =
+                permissions[Manifest.permission.READ_MEDIA_IMAGES] == true ||
+                        permissions[Manifest.permission.READ_EXTERNAL_STORAGE] == true
+
+            if (locationGranted && albumGranted) {
+                Toast.makeText(this, "모든 권한 허용됨", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "일부 권한이 거부됨", Toast.LENGTH_SHORT).show()
+            }
+        }
 
     private fun checkAndRequestPermissions() {
         val permissionList = mutableListOf<String>()

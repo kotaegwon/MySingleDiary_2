@@ -1,5 +1,6 @@
 package com.ko.mysingledairy.fragment
 
+import android.content.Context
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -15,6 +16,7 @@ import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
@@ -25,6 +27,10 @@ import com.ko.mysingledairy.databinding.FragmentEditBinding
 import com.ko.mysingledairy.db.DiaryDao
 import com.ko.mysingledairy.db.DiaryDatabase
 import com.ko.mysingledairy.db.DiaryListEntity
+import com.ko.mysingledairy.factory.DiaryViewModelFactory
+import com.ko.mysingledairy.manager.LocationManager
+import com.ko.mysingledairy.manager.WeatherManager
+import com.ko.mysingledairy.repository.DiaryRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -36,8 +42,7 @@ import java.util.Locale
 
 class EditFragment : Fragment(), View.OnClickListener {
     private lateinit var binding: FragmentEditBinding
-
-    private val viewModel: DiaryViewModel by viewModels()
+    private lateinit var viewModel: DiaryViewModel
 
     private lateinit var diaryDao: DiaryDao
 
@@ -74,6 +79,20 @@ class EditFragment : Fragment(), View.OnClickListener {
 
     companion object {
 
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+        val repo = DiaryRepository(
+            LocationManager(requireContext()),
+            WeatherManager()
+        )
+
+        val factory = DiaryViewModelFactory(repo)
+
+        viewModel = ViewModelProvider(this, factory)
+            .get(DiaryViewModel::class.java)
     }
 
     override fun onCreateView(
@@ -153,6 +172,10 @@ class EditFragment : Fragment(), View.OnClickListener {
         isEditMode = false
 
         Timber.d("onDestroyView -")
+    }
+
+    override fun onDetach() {
+        super.onDetach()
     }
 
     override fun onClick(view: View?) {

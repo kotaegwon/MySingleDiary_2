@@ -34,9 +34,6 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".MainService">
-
-        </service>
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"

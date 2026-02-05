@@ -19,15 +19,16 @@ abstract class DiaryDatabase : RoomDatabase() {
     companion object {
         private var INSTANCE: DiaryDatabase? = null
 
-        fun get(context: Context): DiaryDatabase {
-            if (INSTANCE == null) {
-                INSTANCE = Room.databaseBuilder(
+        fun get(context: Context): DiaryDatabase =
+            INSTANCE ?: synchronized(this) {
+                INSTANCE ?: Room.databaseBuilder(
                     context.applicationContext,
                     DiaryDatabase::class.java,
                     "diary_db"
-                ).fallbackToDestructiveMigration().build()
+                )
+                    .fallbackToDestructiveMigration()
+                    .build()
+                    .also { INSTANCE = it }
             }
-            return INSTANCE!!
-        }
     }
 }
