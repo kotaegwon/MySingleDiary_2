@@ -14,7 +14,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -32,7 +31,6 @@ import com.ko.mysingledairy.manager.LocationManager
 import com.ko.mysingledairy.manager.WeatherManager
 import com.ko.mysingledairy.repository.DiaryRepository
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.io.File
@@ -40,22 +38,37 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+/**
+ * - 다이어리 작성 / 수정 화면
+ * - 날씨, 위치 정보를 표시
+ * - 기분 슬라이더, 사진 선택 / 촬용 기능 포함
+ * - 다이어리 내용 저장, 수정, 삭제 처리
+ */
 class EditFragment : Fragment(), View.OnClickListener {
+
+    // ViewBinding
     private lateinit var binding: FragmentEditBinding
+
+    // ViewModel
     private lateinit var viewModel: DiaryViewModel
 
+    // Room DAO
     private lateinit var diaryDao: DiaryDao
 
+    // 현재 선택된 상태
     private var currentWeather: String? = null
     private var currentMood: Int = 0
     private var currentPhotoUri: Uri? = null
 
+    // 사진 저장용
     private lateinit var photoFile: File
     private lateinit var photoUri: Uri
+
+    // 수정 모드에서 선택된 다이어리 아이템
     private lateinit var modifyItem: DiaryListEntity
+    private var isModifyMode: Boolean = false
 
-    private var isEditMode: Boolean = false
-
+    // 갤러리 선택 ActivityResultLauncher
     private val photoPickerLauncher =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
             uri?.let {
@@ -67,6 +80,7 @@ class EditFragment : Fragment(), View.OnClickListener {
             }
         }
 
+    // 카메라 선택 ActivityResultLauncher
     private val cameraLauncher =
         registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
             if (success) {
@@ -77,24 +91,33 @@ class EditFragment : Fragment(), View.OnClickListener {
             }
         }
 
-    companion object {
-
-    }
-
+    /**
+     * Fragment가 Activity에 붙을 때 호출
+     * - Repository, ViewModelFactory 생성
+     * - ViewModel 초기화
+     */
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
+        // Repository 생성(위치 + 날씨 관리)
         val repo = DiaryRepository(
             LocationManager(requireContext()),
             WeatherManager()
         )
 
+        // ViewModelFactory 생성
         val factory = DiaryViewModelFactory(repo)
 
+        // ViewModel 초기화
         viewModel = ViewModelProvider(this, factory)
             .get(DiaryViewModel::class.java)
     }
 
+    /**
+     * Fragment View 생성
+     * - ViewBinding 초기화
+     * - Room DAO 초기화
+     */
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -111,12 +134,21 @@ class EditFragment : Fragment(), View.OnClickListener {
         return binding.root
     }
 
+    /**
+     * View 생성 이후 호출
+     * - 오늘 날짜 표시
+     * - 전달된 다이어리 아이템 시팅(수정 모드)
+     * - 기분 스라이더 리스너
+     * - ViewModel 위치/날씨 Flow 수집
+     * - 클릭 리스너 등록
+     */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         Timber.d("onViewCreated +")
 
         super.onViewCreated(view, savedInstanceState)
         binding.dateTextView.text = todayDate()
 
+        // 수정 모드로 전달된 DiaryListEntity 가져오기
         val diary = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             arguments?.getParcelable(
                 "diary_item",
@@ -127,15 +159,18 @@ class EditFragment : Fragment(), View.OnClickListener {
             arguments?.getParcelable("diary_item")
         }
 
+        // 수정 모드 세팅
         diary?.let {
             setBundleArgument(it)
         }
 
+        // Mood Slider 리스너
         binding.moodSlider.addOnChangeListener { _, value, _ ->
             val mood = value.toInt()
             currentMood = mood
         }
 
+        // 위치/날씨 Flow 수집
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
 
@@ -157,6 +192,7 @@ class EditFragment : Fragment(), View.OnClickListener {
             }
         }
 
+        // 클릭 리스너 등록
         binding.closeButton.setOnClickListener(this)
         binding.saveButton.setOnClickListener(this)
         binding.deleteButton.setOnClickListener(this)
@@ -165,11 +201,15 @@ class EditFragment : Fragment(), View.OnClickListener {
         Timber.d("onViewCreated -")
     }
 
+    /**
+     * View가 제거될 때 호출
+     * - 메모리 누수 방지
+     */
     override fun onDestroyView() {
         Timber.d("onDestroyView +")
 
         super.onDestroyView()
-        isEditMode = false
+        isModifyMode = false
 
         Timber.d("onDestroyView -")
     }
@@ -178,6 +218,10 @@ class EditFragment : Fragment(), View.OnClickListener {
         super.onDetach()
     }
 
+    /**
+     * 클릭 이벤트 처리
+     * - 닫기, 저장/수정, 삭제, 사진 선택
+     */
     override fun onClick(view: View?) {
         when (view?.id) {
             R.id.closeButton -> {
@@ -198,7 +242,7 @@ class EditFragment : Fragment(), View.OnClickListener {
                 )
 
                 lifecycleScope.launch(Dispatchers.IO) {
-                    if (isEditMode) {
+                    if (isModifyMode) {
                         if (currentMood != 0) {
                             modifyItem.mood = currentMood
                         }
@@ -210,7 +254,7 @@ class EditFragment : Fragment(), View.OnClickListener {
                     }
                 }
 
-                toastText = if (isEditMode) {
+                toastText = if (isModifyMode) {
                     "수정 완료"
                 } else {
                     "저장 완료"
@@ -222,8 +266,10 @@ class EditFragment : Fragment(), View.OnClickListener {
 
 
             R.id.deleteButton -> {
-                lifecycleScope.launch(Dispatchers.IO) {
-                    diaryDao.deleteById(modifyItem.id)
+                if (isModifyMode) {
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        diaryDao.deleteById(modifyItem.id)
+                    }
                 }
                 findNavController().popBackStack()
             }
@@ -234,8 +280,11 @@ class EditFragment : Fragment(), View.OnClickListener {
         }
     }
 
+    /**
+     * 수정 모드 다이어리 세팅
+     */
     fun setBundleArgument(items: DiaryListEntity) {
-        isEditMode = true
+        isModifyMode = true
         modifyItem = items
 
         setWeatherIcon(items.weather)
@@ -253,6 +302,9 @@ class EditFragment : Fragment(), View.OnClickListener {
         binding.moodSlider.value = items.mood.coerceIn(1, 5).toFloat()
     }
 
+    /**
+     * 날씨 아이콘 설정
+     */
     fun setWeatherIcon(weather: String) {
         when (weather) {
             "맑음" -> binding.weatherIcon.setImageResource(R.drawable.weather_1)
@@ -264,6 +316,9 @@ class EditFragment : Fragment(), View.OnClickListener {
 
     fun todayDate(): String = SimpleDateFormat("MM월 dd일", Locale.KOREA).format(Date())
 
+    /**
+     * 사진 선택/촬영 다이얼로그 표시
+     */
     fun showPictureSetDialog() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_radio, null)
 
@@ -301,10 +356,16 @@ class EditFragment : Fragment(), View.OnClickListener {
         dialog.show()
     }
 
+    /**
+     * 갤러리에서 사진 선택
+     */
     fun showPhotoSelectionActivity() {
         photoPickerLauncher.launch("image/*")
     }
 
+    /**
+     * 임시 파일 생성(카메라 촬영용)
+     */
     fun createFile(): File {
         val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
         val storageDir = requireContext().cacheDir   // cacheDir 권장
@@ -315,6 +376,9 @@ class EditFragment : Fragment(), View.OnClickListener {
         )
     }
 
+    /**
+     * 카메라 촬영 Activity 호출
+     */
     fun showPhotoCaptureActivity() {
         photoFile = createFile()
 
@@ -327,6 +391,9 @@ class EditFragment : Fragment(), View.OnClickListener {
         cameraLauncher.launch(photoUri)
     }
 
+    /**
+     * 선택한 URI를 앱 내부 저장소에 복사 후 경로 반환
+     */
     private fun copyUriToInternalStorage(uri: Uri): String {
         val resolver = requireContext().contentResolver
         val inputStream = resolver.openInputStream(uri) ?: return ""
